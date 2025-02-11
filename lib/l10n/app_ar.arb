@@ -1,0 +1,15 @@
+{
+  "setup_screen_title": "خصص تجربتك",
+  "setup_screen_descrption": "قم بتحديد اللغه و السمه المناسبه لاستخدام سهل للتطييق",
+  "language": "اللغه",
+  "theme": "السمه",
+  "lets_start": "ابدا الاستخدام",
+  "email": "البريد الالكتروني",
+  "password": "كلمة المرور",
+  "forget_passwort": "نسيت كلمم المرور",
+  "login": "تسجيل الدخول",
+  "create_account": "انشاء حساب",
+  "dont_have_account": "ليس لديك حساب",
+  "or": "او",
+  "login_with_google": "الدخول باستخدام جوجل"
+}

@@ -1,6 +1,8 @@
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
+import 'package:evently_c13/providers/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
+import 'package:provider/provider.dart';
 
 class ThemeSwitcher extends StatefulWidget {
   const ThemeSwitcher({super.key});
@@ -10,19 +12,18 @@ class ThemeSwitcher extends StatefulWidget {
 }
 
 class _ThemeSwitcherState extends State<ThemeSwitcher> {
-  var selectedThemeMode = ThemeMode.light;
   @override
   Widget build(BuildContext context) {
+    ThemeProvider themeProvider = Provider.of<ThemeProvider>(context);
     return AnimatedToggleSwitch<ThemeMode>.rolling(
-      current: selectedThemeMode,
+      current: themeProvider.currentTheme,
       values: const [ThemeMode.dark, ThemeMode.light],
       style: ToggleStyle(
           backgroundColor: Colors.transparent,
           indicatorColor: Theme.of(context).primaryColor,
           borderColor: Theme.of(context).primaryColor),
       onChanged: (newThemeMode) {
-        selectedThemeMode = newThemeMode;
-        setState(() {});
+        themeProvider.changeTheme(newThemeMode);
         // setState(() => value = i);
         // return Future<dynamic>.delayed(const Duration(seconds: 3));
       },

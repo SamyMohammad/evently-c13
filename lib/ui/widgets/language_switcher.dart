@@ -1,6 +1,8 @@
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
+import 'package:evently_c13/providers/language_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
+import 'package:provider/provider.dart';
 
 class LanguageSwitcher extends StatefulWidget {
   const LanguageSwitcher({super.key});
@@ -10,20 +12,23 @@ class LanguageSwitcher extends StatefulWidget {
 }
 
 class _LanguageSwitcherState extends State<LanguageSwitcher> {
-  var selectedLocal = "ar";
+
 
   @override
   Widget build(BuildContext context) {
+    LanguageProvider languageProvider = Provider.of<LanguageProvider>(context);
     return AnimatedToggleSwitch<String>.rolling(
-      current: selectedLocal,
+      current: languageProvider.currentLocale,
       values: const ["ar", "en"],
       style: ToggleStyle(
           backgroundColor: Colors.transparent,
           indicatorColor: Theme.of(context).primaryColor,
           borderColor: Theme.of(context).primaryColor),
-      onChanged: (newLocal) {
-        selectedLocal = newLocal;
-        setState(() {});
+      onChanged: (newLocale) {
+        Future.delayed(Duration(microseconds: 500),(){
+        languageProvider.changeLocale(newLocale);
+        });
+
         // setState(() => value = i);
         // return Future<dynamic>.delayed(const Duration(seconds: 3));
       },

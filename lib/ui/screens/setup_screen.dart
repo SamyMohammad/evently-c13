@@ -1,4 +1,6 @@
 import 'package:evently_c13/core/app_assets.dart';
+import 'package:evently_c13/l10n/app_translations.dart';
+import 'package:evently_c13/ui/screens/login_screen.dart';
 import 'package:evently_c13/ui/widgets/language_switcher.dart';
 import 'package:evently_c13/ui/widgets/theme_switcher.dart';
 import 'package:flutter/material.dart';
@@ -31,14 +33,14 @@ class SetupScreen extends StatelessWidget {
                 height: 10,
               ),
               Text(
-                "Personalize Your Experience",
+                getTranslations(context).setup_screen_title,
                 style: Theme.of(context).textTheme.labelLarge,
               ),
               const SizedBox(
                 height: 10,
               ),
               Text(
-                "Choose your preferred theme and language to get started with a comfortable, tailored experience that suits your style.",
+                getTranslations(context).setup_screen_descrption,
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
               const SizedBox(
@@ -48,7 +50,7 @@ class SetupScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Language",
+                    getTranslations(context).language,
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                   const LanguageSwitcher(),
@@ -61,14 +63,16 @@ class SetupScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Theme",
+                    getTranslations(context).theme,
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                   const ThemeSwitcher(),
                 ],
               ),
               const Spacer(),
-              FilledButton(onPressed: () {}, child: const Text("let's Start"))
+              FilledButton(onPressed: () {
+                Navigator.pushNamed(context, LoginScreen.routeName);
+              }, child: Text(getTranslations(context).lets_start))
             ],
           ),
         ),

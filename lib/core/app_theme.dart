@@ -45,7 +45,6 @@ class AppTheme {
               foregroundColor: AppColors.purple,
               textStyle: const TextStyle(
                   color: AppColors.purple,
-                  decoration: TextDecoration.underline,
                   fontStyle: FontStyle.italic,
                   fontWeight: FontWeight.bold,
                   fontSize: 20))),
@@ -117,7 +116,6 @@ class AppTheme {
           foregroundColor: AppColors.purple,
             textStyle: const TextStyle(
                 color: AppColors.purple,
-                decoration: TextDecoration.underline,
                 fontStyle: FontStyle.italic,
                 fontWeight: FontWeight.bold,
                 fontSize: 20))),
