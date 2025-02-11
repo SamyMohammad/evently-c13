@@ -2,12 +2,14 @@ import 'package:evently_c13/auth/firebase_auth_services.dart';
 import 'package:evently_c13/core/app_assets.dart';
 import 'package:evently_c13/core/app_colors.dart';
 import 'package:evently_c13/core/validation_utils.dart';
+import 'package:evently_c13/providers/AuthProvider.dart';
 import 'package:evently_c13/ui/screens/HomeScreen.dart';
 import 'package:evently_c13/ui/screens/login_screen.dart';
 import 'package:evently_c13/ui/widgets/language_switcher.dart';
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:evently_c13/core/dialog_utils.dart';
+import 'package:provider/provider.dart';
 
 class RegisterScreen extends StatefulWidget {
   static const String routeName = "RegisterScreen";
@@ -204,9 +206,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
     } else if (response.userCredential != null) {
       // show register success message
+      var authProvider = Provider.of<AuthProvider>(context, listen: false);
+      authProvider.saveUser(response.user);
       showMessageDialog("Successful registration", posActionTitle: "ok",
           posAction: () {
-        Navigator.pushReplacementNamed(context, Homescreen.routeName);
+        Navigator.pushReplacementNamed(context, HomeScreen.routeName);
       });
     }
   }

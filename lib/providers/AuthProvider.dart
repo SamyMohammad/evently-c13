@@ -16,6 +16,7 @@ class AuthProvider extends ChangeNotifier {
 
   void readUser() async {
     appUser = await UsersDao.readUser(firebaseAuthUser!.uid);
+    notifyListeners();
   }
 
   bool isLoggedIn() {
@@ -26,5 +27,11 @@ class AuthProvider extends ChangeNotifier {
     FirebaseAuth.instance.signOut();
     appUser = null;
     firebaseAuthUser = null;
+  }
+
+  void saveUser(AppUser? user) {
+    appUser = user;
+    firebaseAuthUser = FirebaseAuth.instance.currentUser;
+    notifyListeners();
   }
 }

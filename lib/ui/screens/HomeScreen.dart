@@ -1,55 +1,66 @@
 import 'package:evently_c13/core/app_colors.dart';
 import 'package:evently_c13/core/dialog_utils.dart';
+import 'package:evently_c13/db/dao/events_dao.dart';
+import 'package:evently_c13/db/model/AppUser.dart';
 import 'package:evently_c13/db/model/event_model.dart';
 import 'package:evently_c13/db/model/event_type_model.dart';
 import 'package:evently_c13/providers/AuthProvider.dart';
 import 'package:evently_c13/ui/screens/add_event_screen.dart';
 import 'package:evently_c13/ui/screens/login_screen.dart';
+import 'package:evently_c13/ui/screens/tabs/favorite/favorite_tab.dart';
+import 'package:evently_c13/ui/screens/tabs/home/home_tab.dart';
+import 'package:evently_c13/ui/screens/tabs/map/map_tab.dart';
+import 'package:evently_c13/ui/screens/tabs/profile/profile_tab.dart';
 import 'package:evently_c13/ui/widgets/events_list_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class Homescreen extends StatefulWidget {
+class HomeScreen extends StatefulWidget {
   static const String routeName = "home";
 
-  const Homescreen({super.key});
+  const HomeScreen({super.key});
 
   @override
-  State<Homescreen> createState() => _HomescreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomescreenState extends State<Homescreen> {
-  int _selectedIndex = 0;
+class _HomeScreenState extends State<HomeScreen> {
+  int _selectedTabIndex = 0;
+  int _selectedEventTypeIndex = 0;
 
-  void _onItemTapped(int index) {
+  void _onTopBarTabClick(int index) {
     setState(() {
-      _selectedIndex = index;
+      _selectedEventTypeIndex = index;
     });
   }
 
-  List<EventModel> events = [];
-  filterEventsById(int eventTypeId) {
-    if (eventTypeId != 0) {
-      events = EventModel.events
-          .where((element) => element.eventTypeId == eventTypeId)
-          .toList();
-    } else {
-      events = EventModel.events;
-    }
+  void _onBottomNavBarTapped(int index) {
+    setState(() {
+      _selectedTabIndex = index;
+    });
   }
+
 
   @override
   initState() {
     super.initState();
-    filterEventsById(0);
   }
+  var eventTypes = EventType.getEventTypes();
 
+  List<Widget?> bottomNavTabs = [
+    null,
+    MapTab(),
+    FavoriteTab(),
+    ProfileTab(),
+  ];
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
+    var authProvider = Provider.of<AuthProvider>(context);
+    print(authProvider.appUser);
     return SafeArea(
       child: DefaultTabController(
-        length: 8,
+        length: eventTypes.length,
         child: Scaffold(
           floatingActionButtonLocation:
               FloatingActionButtonLocation.centerDocked,
@@ -93,9 +104,9 @@ class _HomescreenState extends State<Homescreen> {
                 backgroundColor: AppColors.purple,
               ),
             ],
-            currentIndex: _selectedIndex,
-            onTap: _onItemTapped,
-          ),
+              currentIndex: _selectedTabIndex,
+              onTap: _onBottomNavBarTapped,
+            ),
           appBar: AppBar(
             toolbarHeight: height * 0.15,
             backgroundColor: AppColors.purple,
@@ -104,8 +115,9 @@ class _HomescreenState extends State<Homescreen> {
                     bottomLeft: Radius.circular(20),
                     bottomRight: Radius.circular(20))),
             centerTitle: false,
-            bottom: TabBar(
-              unselectedLabelColor: AppColors.white,
+              bottom: _selectedTabIndex == 0
+                  ? TabBar(
+                      unselectedLabelColor: AppColors.white,
               labelColor: AppColors.purple,
               indicatorSize: TabBarIndicatorSize.label,
               dividerHeight: 0,
@@ -113,17 +125,10 @@ class _HomescreenState extends State<Homescreen> {
               indicator: BoxDecoration(
                   borderRadius: BorderRadius.circular(30),
                   color: AppColors.white),
-              onTap: (index) {
-                if (index == 0) {
-                  filterEventsById(0);
-                } else {
-                  filterEventsById(EventType.eventTypes[index].id);
-                }
-                setState(() {});
-              },
-              isScrollable: true,
+                      onTap: _onTopBarTabClick,
+                      isScrollable: true,
               tabs: [
-                ...EventType.eventTypes.map((eventType) => Padding(
+                ...eventTypes.map((eventType) => Padding(
                       padding: const EdgeInsets.all(10),
                       child: Row(
                         spacing: 8,
@@ -131,21 +136,18 @@ class _HomescreenState extends State<Homescreen> {
                       ),
                     ))
               ],
-            ),
-            title: buildAppBarTitle(),
-            actions: buildAppBarActions,
+                    )
+                  : null,
+              title: buildAppBarTitle(authProvider.appUser),
+              actions: buildAppBarActions,
           ),
-          body: TabBarView(
-            children: [
-              ...EventType.eventTypes.map((eventType) => EventsListView(
-                    events: events,
-                  ))
-            ],
-          ),
-        ),
+            body: _selectedTabIndex == 0
+                ? HomeTab(eventTypes[_selectedEventTypeIndex])
+                : bottomNavTabs[_selectedTabIndex]),
       ),
     );
   }
+
 
   List<Widget> get buildAppBarActions {
     return [
@@ -171,8 +173,8 @@ class _HomescreenState extends State<Homescreen> {
     ];
   }
 
-  Column buildAppBarTitle() {
-    return const Column(
+  Column buildAppBarTitle(AppUser? appUser) {
+    return Column(
       spacing: 4,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -184,7 +186,7 @@ class _HomescreenState extends State<Homescreen> {
               fontWeight: FontWeight.w400),
         ),
         Text(
-          "John Safwat",
+          appUser?.name ?? "",
           style: TextStyle(
               fontSize: 25,
               color: AppColors.white,

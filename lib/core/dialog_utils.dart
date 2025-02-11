@@ -39,4 +39,32 @@ extension Dialoges on State {
       },
     );
   }
+
+  void showLoadingDialog(
+    String message,
+  ) {
+    showDialog(
+      context: context,
+      builder: (buildContext) {
+        return AlertDialog(
+          content: Row(
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(
+                width: 10,
+              ),
+              Text(
+                message,
+                style: TextStyle(fontSize: 16, color: Colors.black),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void hideDialog() {
+    Navigator.pop(context);
+  }
 }
