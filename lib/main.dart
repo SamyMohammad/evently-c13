@@ -5,6 +5,7 @@ import 'package:evently_c13/providers/language_provider.dart';
 import 'package:evently_c13/providers/theme_provider.dart';
 import 'package:evently_c13/ui/screens/HomeScreen.dart';
 import 'package:evently_c13/ui/screens/add_event_screen.dart';
+import 'package:evently_c13/ui/screens/event_details_screen.dart';
 import 'package:evently_c13/ui/screens/forget_password.dart';
 import 'package:evently_c13/ui/screens/login_screen.dart';
 import 'package:evently_c13/ui/screens/register_screen.dart';
@@ -47,6 +48,7 @@ class MyApp extends StatelessWidget {
     ThemeProvider themeProvider = Provider.of<ThemeProvider>(context);
     AuthProvider authProvider = Provider.of<AuthProvider>(context);
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       // localizationsDelegates: context.localizationDelegates,
       // supportedLocales: context.supportedLocales,
       // locale: context.locale,
@@ -54,10 +56,12 @@ class MyApp extends StatelessWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       // themeMode: themeProvider.currentTheme,
-      // initialRoute: authProvider.isLoggedIn()
+      // initialRoute: authProvider.isLo
+      // ggedIn()
       //     ? Homescreen.routeName
       //     : SetupScreen.routeName,
       initialRoute: Homescreen.routeName,
+
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       locale: Locale(languageProvider.currentLocale),
@@ -65,9 +69,10 @@ class MyApp extends StatelessWidget {
         AddEventScreen.routeName: (_) => const AddEventScreen(),
         Homescreen.routeName: (_) => const Homescreen(),
         SetupScreen.routeName: (_) => const SetupScreen(),
-        LoginScreen.routeName: (_) => LoginScreen(),
+        LoginScreen.routeName: (_) => const LoginScreen(),
         RegisterScreen.routeName: (_) => RegisterScreen(),
-        ForgetPassword.routeName: (_) => const ForgetPassword()
+        ForgetPassword.routeName: (_) => const ForgetPassword(),
+        EventDetailsScreen.routeName: (_) => const EventDetailsScreen()
       },
     );
   }

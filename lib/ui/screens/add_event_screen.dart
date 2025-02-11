@@ -1,6 +1,7 @@
 import 'package:evently_c13/core/app_colors.dart';
 import 'package:evently_c13/db/model/event_type_model.dart';
 import 'package:evently_c13/ui/widgets/custom_text_form_field.dart';
+import 'package:evently_c13/ui/widgets/selection_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -57,7 +58,11 @@ class _AddEventScreenState extends State<AddEventScreen> {
                     color: AppColors.black,
                     fontSize: 18),
               ),
-              buildChooseLocation(),
+              const SelectionWidget(
+                prefixIcon: Icons.location_on_outlined,
+                title: Text("Choose Location"),
+                isSuffixIcon: true,
+              ),
               ElevatedButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
@@ -77,138 +82,112 @@ class _AddEventScreenState extends State<AddEventScreen> {
     );
   }
 
-  Container buildChooseLocation() {
-    return Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                border: Border.all(color: AppColors.purple),
-              ),
-              child: Row(spacing: 8, children: [
-                Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: AppColors.purple,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Icon(
-                      Icons.location_on,
-                      color: AppColors.white,
-                    )),
-                const Text("Choose Event Location"),
-                const Spacer(),
-                const Icon(
-                  Icons.arrow_forward_ios,
-                  color: AppColors.purple,
-                )
-              ]),
-            );
-  }
+  // Container buildChooseLocation() {
+  //   return ;
+  // }
 
   InkWell buildChooseTime() {
     return const InkWell(
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.access_time_outlined,
-                    size: 30,
-                  ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  Text(
-                    "Event Time",
-                    style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.black,
-                        fontSize: 18),
-                  ),
-                  Spacer(),
-                  Text(
-                    "Choose Time",
-                    style:
-                        TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
-                  )
-                ],
-              ),
-            );
+      child: Row(
+        children: [
+          Icon(
+            Icons.access_time_outlined,
+            size: 30,
+          ),
+          SizedBox(
+            width: 10,
+          ),
+          Text(
+            "Event Time",
+            style: TextStyle(
+                fontWeight: FontWeight.w500,
+                color: AppColors.black,
+                fontSize: 18),
+          ),
+          Spacer(),
+          Text(
+            "Choose Time",
+            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
+          )
+        ],
+      ),
+    );
   }
 
   InkWell buildChooseDate() {
     return const InkWell(
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.calendar_month_outlined,
-                    size: 30,
-                  ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  Text(
-                    "Event Date",
-                    style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.black,
-                        fontSize: 18),
-                  ),
-                  Spacer(),
-                  Text(
-                    "Choose Date",
-                    style:
-                        TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
-                  )
-                ],
-              ),
-            );
+      child: Row(
+        children: [
+          Icon(
+            Icons.calendar_month_outlined,
+            size: 30,
+          ),
+          SizedBox(
+            width: 10,
+          ),
+          Text(
+            "Event Date",
+            style: TextStyle(
+                fontWeight: FontWeight.w500,
+                color: AppColors.black,
+                fontSize: 18),
+          ),
+          Spacer(),
+          Text(
+            "Choose Date",
+            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
+          )
+        ],
+      ),
+    );
   }
 
   SizedBox buildEventTypesListView() {
     return SizedBox(
-              height: 50,
-              child: ListView.builder(
-                  itemCount: eventTypes.length,
-                  scrollDirection: Axis.horizontal,
-                  itemBuilder: (context, index) {
-                    return InkWell(
-                      onTap: () {
-                        setState(() {
-                          selexctedIndex = index;
-                        });
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 10),
-                        margin: const EdgeInsets.only(right: 10),
-                        height: 50,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: AppColors.purple),
-                          borderRadius: BorderRadius.circular(20),
-                          color: selexctedIndex == index
-                              ? AppColors.purple
-                              : AppColors.white,
-                        ),
-                        child: Row(
-                          spacing: 8,
-                          children: [
-                            FaIcon(
-                              eventTypes[index].icon.icon,
-                              color: selexctedIndex == index
-                                  ? AppColors.white
-                                  : AppColors.purple,
-                            ),
-                            Text(eventTypes[index].name,
-                                style: TextStyle(
-                                    color: selexctedIndex == index
-                                        ? AppColors.white
-                                        : AppColors.purple,
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 18)),
-                          ],
-                        ),
-                      ),
-                    );
-                  }),
+      height: 50,
+      child: ListView.builder(
+          itemCount: eventTypes.length,
+          scrollDirection: Axis.horizontal,
+          itemBuilder: (context, index) {
+            return InkWell(
+              onTap: () {
+                setState(() {
+                  selexctedIndex = index;
+                });
+              },
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                margin: const EdgeInsets.only(right: 10),
+                height: 50,
+                decoration: BoxDecoration(
+                  border: Border.all(color: AppColors.purple),
+                  borderRadius: BorderRadius.circular(20),
+                  color: selexctedIndex == index
+                      ? AppColors.purple
+                      : AppColors.white,
+                ),
+                child: Row(
+                  spacing: 8,
+                  children: [
+                    FaIcon(
+                      eventTypes[index].icon.icon,
+                      color: selexctedIndex == index
+                          ? AppColors.white
+                          : AppColors.purple,
+                    ),
+                    Text(eventTypes[index].name,
+                        style: TextStyle(
+                            color: selexctedIndex == index
+                                ? AppColors.white
+                                : AppColors.purple,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 18)),
+                  ],
+                ),
+              ),
             );
+          }),
+    );
   }
 }
