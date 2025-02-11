@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 
 class EventsListView extends StatelessWidget {
   final List<EventModel> events;
-  OnFavoriteCallBack onFavoriteCallBack;
+  final OnFavoriteCallBack onFavoriteCallBack;
 
-  EventsListView(
+  const EventsListView(
       {super.key, required this.events, required this.onFavoriteCallBack});
 
   @override
@@ -20,7 +20,10 @@ class EventsListView extends StatelessWidget {
               Navigator.pushNamed(context, EventDetailsScreen.routeName,
                   arguments: events[index]);
             },
-            child: const EventItem());
+            child: EventItem(
+              event: events[index],
+              onFavoriteCallBack: (event) {},
+            ));
       },
     );
   }

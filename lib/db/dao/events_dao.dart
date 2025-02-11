@@ -1,9 +1,8 @@
-import 'dart:ffi';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:evently_c13/db/model/AppUser.dart';
 import 'package:evently_c13/db/model/DataBaseResponse.dart';
 import 'package:evently_c13/db/model/event_model.dart';
+import 'package:flutter/foundation.dart';
 
 class EventsDao {
   static const String eventsCollection = "events";
@@ -44,7 +43,9 @@ class EventsDao {
         eventTypeId: eventType);
     try {
       await docRef.set(event);
-      print('adding end');
+      if (kDebugMode) {
+        print('adding end');
+      }
       return DataBaseResponse(isSuccess: true, data: event);
     } on Exception catch (ex) {
       print('exce $ex');

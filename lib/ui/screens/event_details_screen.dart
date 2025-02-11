@@ -44,11 +44,13 @@ class EventDetailsScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    DateFormat.yMMMMEEEEd().format(event.date),
+                    DateFormat.yMMMMEEEEd()
+                        .format(event.date?.toDate() ?? DateTime.now()),
                     style: const TextStyle(fontSize: 16),
                   ),
                   Text(
-                    DateFormat.jm().format(event.date),
+                    DateFormat.jm()
+                        .format(event.date?.toDate() ?? DateTime.now()),
                     style: const TextStyle(fontSize: 16, color: Colors.black),
                   )
                 ],
@@ -64,7 +66,7 @@ class EventDetailsScreen extends StatelessWidget {
               style: TextStyle(fontSize: 16, color: Colors.black),
             ),
             Text(
-              event.description,
+              event.description ?? '',
               style: const TextStyle(fontSize: 16, color: Colors.black),
             )
           ],
