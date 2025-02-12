@@ -9,10 +9,11 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 typedef OnFavoriteCallBack = void Function(EventModel event);
 
 class EventItem extends StatelessWidget {
-  EventModel event;
-  OnFavoriteCallBack onFavoriteCallBack;
+  final EventModel event;
+  final OnFavoriteCallBack onFavoriteCallBack;
 
-  EventItem(this.event, this.onFavoriteCallBack, {super.key});
+  const EventItem(
+      {required this.event, required this.onFavoriteCallBack, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +23,7 @@ class EventItem extends StatelessWidget {
       margin: const EdgeInsets.all(10),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(20)),
+          borderRadius: const BorderRadius.all(Radius.circular(20)),
           image: DecorationImage(
             image: AssetImage(
               EventType.getEventImageById(event.eventTypeId ?? 0),
@@ -41,18 +42,18 @@ class EventItem extends StatelessWidget {
 
   Container buildTitleContainer(BuildContext context) {
     return Container(
-          padding: const EdgeInsets.all(8),
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.all(Radius.circular(10)),
-          ),
-          child: Row(
-            children: [
-              Text(
+      padding: const EdgeInsets.all(8),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.all(Radius.circular(10)),
+      ),
+      child: Row(
+        children: [
+          Text(
             event.title ?? "",
             style: Theme.of(context).textTheme.bodyLarge,
-              ),
-              const Spacer(),
+          ),
+          const Spacer(),
           InkWell(
             onTap: () {
               onFavoriteCallBack.call(event);
@@ -64,9 +65,9 @@ class EventItem extends StatelessWidget {
               color: AppColors.purple,
             ),
           ),
-            ],
-          ),
-        );
+        ],
+      ),
+    );
   }
 
   Container buildDateContainer(Timestamp? timeStamp) {
@@ -80,14 +81,14 @@ class EventItem extends StatelessWidget {
         children: [
           Text(
             "${timeStamp?.toDate().day}",
-            style: TextStyle(
+            style: const TextStyle(
                 fontSize: 25,
                 fontWeight: FontWeight.bold,
                 color: AppColors.purple),
           ),
           Text(
-            "${getMonthNameFromDate(timeStamp!.toDate())}",
-            style: TextStyle(
+            getMonthNameFromDate(timeStamp!.toDate()),
+            style: const TextStyle(
                 fontSize: 25,
                 fontWeight: FontWeight.bold,
                 color: AppColors.purple),

@@ -22,7 +22,7 @@ class _HomeTabState extends State<HomeTab> {
   Widget build(BuildContext context) {
     var authProvider = Provider.of<AuthProvider>(context);
     if (authProvider.appUser == null) {
-      return Center(
+      return const Center(
         child: CircularProgressIndicator(),
       );
     } else {
@@ -32,7 +32,7 @@ class _HomeTabState extends State<HomeTab> {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             // waiting for future to complete
-            return Center(
+            return const Center(
               child: CircularProgressIndicator(),
             );
           } else if (snapshot.hasError) {
@@ -40,7 +40,7 @@ class _HomeTabState extends State<HomeTab> {
           }
           var events = snapshot.data?.data;
           if (events == null || events.isEmpty) {
-            return Center(
+            return const Center(
               child: Text("No Events Found"),
             );
           }
@@ -56,7 +56,8 @@ class _HomeTabState extends State<HomeTab> {
   void onFavoriteCallBack(EventModel event) async {
     event.isFavorite = !event.isFavorite;
     var authProvider = Provider.of<AuthProvider>(context, listen: false);
-    await EventsDao.updateEvent(authProvider.appUser?.id ?? "", event);
+    await EventsDao.updateEvent(
+        userId: authProvider.appUser?.id ?? "", event: event);
     setState(() {});
   }
 }

@@ -1,9 +1,8 @@
-import 'dart:ffi';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:evently_c13/db/model/AppUser.dart';
 import 'package:evently_c13/db/model/DataBaseResponse.dart';
 import 'package:evently_c13/db/model/event_model.dart';
+import 'package:flutter/foundation.dart';
 
 class EventsDao {
   static const String eventsCollection = "events";
@@ -29,8 +28,7 @@ class EventsDao {
     DateTime date,
     int time,
     int eventType,
-    double? lat,
-    double? lng,
+    GeoPoint? geoPoint,
   ) async {
     var docRef = getEventsCollection(userId).doc();
     var event = EventModel(
@@ -39,12 +37,14 @@ class EventsDao {
         description: description,
         date: Timestamp.fromMillisecondsSinceEpoch(date.millisecondsSinceEpoch),
         time: time,
-        lat: null,
-        long: null,
+        geoPoint: geoPoint,
+        //  const GeoPoint(31.244288, 29.9859968),
         eventTypeId: eventType);
     try {
       await docRef.set(event);
-      print('adding end');
+      if (kDebugMode) {
+        print('adding end');
+      }
       return DataBaseResponse(isSuccess: true, data: event);
     } on Exception catch (ex) {
       print('exce $ex');
@@ -79,9 +79,19 @@ class EventsDao {
     }
   }
 
-  static Future<void> updateEvent(String userId, EventModel event) async {
-    var docRef = getEventsCollection(userId).doc(event.id);
-    await docRef.set(event);
+  static Future<DataBaseResponse<void>> updateEvent(
+      {required String userId, required EventModel event}) async {
+    try {
+      var docRef = getEventsCollection(userId).doc();
+      await docRef.update(
+        event.toFireStore(),
+      );
+      return DataBaseResponse(isSuccess: true);
+    } on FirebaseException catch (ex) {
+      return DataBaseResponse(isSuccess: false, exception: ex);
+    } on Exception catch (ex) {
+      return DataBaseResponse(isSuccess: false, exception: ex);
+    }
   }
 
   static Future<DataBaseResponse<List<EventModel>>> loadFavoriteEvents(

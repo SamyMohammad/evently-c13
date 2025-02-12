@@ -1,27 +1,31 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:evently_c13/core/app_colors.dart';
+import 'package:evently_c13/core/dialog_utils.dart';
 import 'package:evently_c13/db/dao/events_dao.dart';
+import 'package:evently_c13/db/model/event_model.dart';
 import 'package:evently_c13/db/model/event_type_model.dart';
 import 'package:evently_c13/l10n/DateTimeUtils.dart';
 import 'package:evently_c13/providers/AuthProvider.dart';
 import 'package:evently_c13/ui/widgets/custom_text_form_field.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:evently_c13/core/dialog_utils.dart';
 import 'package:provider/provider.dart';
 
-class AddEventScreen extends StatefulWidget {
+class UpsertEventScreen extends StatefulWidget {
   static const String routeName = "add_event";
-  const AddEventScreen({super.key});
+  const UpsertEventScreen({super.key});
 
   @override
-  State<AddEventScreen> createState() => _AddEventScreenState();
+  State<UpsertEventScreen> createState() => _UpsertEventScreenState();
 }
 
-class _AddEventScreenState extends State<AddEventScreen> {
+class _UpsertEventScreenState extends State<UpsertEventScreen>
+    with AutomaticKeepAliveClientMixin {
   var selexctedIndex = 0;
   List<EventType> eventTypes = [];
-  var titleController = TextEditingController();
-  var descriptionController = TextEditingController();
+  late TextEditingController titleController;
+  late TextEditingController descriptionController;
+  EventModel? eventModel;
 
   @override
   void initState() {
@@ -29,6 +33,29 @@ class _AddEventScreenState extends State<AddEventScreen> {
     var types = EventType.getEventTypes();
     types.removeAt(0);
     eventTypes = types;
+    titleController = TextEditingController();
+    descriptionController = TextEditingController();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      eventModel = ModalRoute.of(context)!.settings.arguments as EventModel?;
+      if (eventModel != null) {
+        titleController = TextEditingController(text: eventModel?.title ?? '');
+        descriptionController =
+            TextEditingController(text: eventModel?.description ?? '');
+        selectedDate = DateTime.fromMillisecondsSinceEpoch(
+            eventModel!.date?.millisecondsSinceEpoch ?? 0);
+        selectedTime = DateTime(
+            0,
+            0,
+            0,
+            DateTime.fromMillisecondsSinceEpoch(eventModel!.time!).hour,
+            DateTime.fromMillisecondsSinceEpoch(eventModel!.time!).minute);
+
+        selexctedIndex = eventTypes.indexWhere((type) {
+          return type.id == eventModel?.eventTypeId;
+        });
+      }
+      setState(() {});
+    });
   }
 
   var formKey = GlobalKey<FormState>();
@@ -36,7 +63,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Create Event"),
+        title: Text(eventModel == null ? "Create Event" : "Update Event"),
       ),
       body: Form(
         key: formKey,
@@ -61,6 +88,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
                     if (newText?.trim().isEmpty == true) {
                       return "please Enter event title";
                     }
+                    return null;
                   },
                 ),
                 CustomTextFormField(
@@ -72,6 +100,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
                     if (newText?.trim().isEmpty == true) {
                       return "please Enter event Description";
                     }
+                    return null;
                   },
                 ),
                 buildChooseDate(),
@@ -85,18 +114,17 @@ class _AddEventScreenState extends State<AddEventScreen> {
                 ),
                 buildChooseLocation(),
                 ElevatedButton(
-                    onPressed: () {
-                      addEvent();
-                    },
+                    onPressed: () =>
+                        eventModel == null ? addEvent() : updateEvent(),
                     style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
                         backgroundColor: AppColors.purple,
                         padding: const EdgeInsets.symmetric(
                             horizontal: 50, vertical: 10)),
-                    child: const Text(
-                      "Add Event",
-                      style: TextStyle(fontSize: 20, color: Colors.white),
+                    child: Text(
+                      eventModel == null ? "Add Event" : "Update Event",
+                      style: const TextStyle(fontSize: 20, color: Colors.white),
                     )),
               ],
             ),
@@ -144,26 +172,27 @@ class _AddEventScreenState extends State<AddEventScreen> {
         children: [
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.access_time_outlined,
                 size: 30,
               ),
-              SizedBox(
+              const SizedBox(
                 width: 10,
               ),
-              Text(
+              const Text(
                 "Event Time",
                 style: TextStyle(
                     fontWeight: FontWeight.w500,
                     color: AppColors.black,
                     fontSize: 18),
               ),
-              Spacer(),
+              const Spacer(),
               Text(
                 selectedTime == null
                     ? "Choose Time"
                     : formatTime(selectedTime!),
-                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
+                style:
+                    const TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
               )
             ],
           ),
@@ -188,26 +217,27 @@ class _AddEventScreenState extends State<AddEventScreen> {
         children: [
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.calendar_month_outlined,
                 size: 30,
               ),
-              SizedBox(
+              const SizedBox(
                 width: 10,
               ),
-              Text(
+              const Text(
                 "Event Date",
                 style: TextStyle(
                     fontWeight: FontWeight.w500,
                     color: AppColors.black,
                     fontSize: 18),
               ),
-              Spacer(),
+              const Spacer(),
               Text(
                 selectedDate == null
                     ? "Choose Date"
                     : formatDate(selectedDate!),
-                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
+                style:
+                    const TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
               )
             ],
           ),
@@ -289,6 +319,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
     var authProvider = Provider.of<AuthProvider>(context, listen: false);
     showLoadingDialog("Loading...");
     print(authProvider.appUser?.id);
+
     var response = await EventsDao.addEvent(
         authProvider.appUser?.id ?? "",
         titleController.text,
@@ -296,8 +327,8 @@ class _AddEventScreenState extends State<AddEventScreen> {
         selectedDate!,
         selectedTime!.millisecondsSinceEpoch,
         eventTypes[selexctedIndex].id,
-        null,
-        null);
+        const GeoPoint(31.244288, 29.9859968));
+
     print('adding in add event');
 
     hideDialog();
@@ -314,6 +345,46 @@ class _AddEventScreenState extends State<AddEventScreen> {
     }
   }
 
+  Future<void> updateEvent() async {
+    setState(() {
+      hasValidTime = selectedTime != null;
+      hasValidDate = selectedDate != null;
+    });
+    if (formKey.currentState?.validate() == false ||
+        !hasValidTime && !hasValidDate) {
+      return;
+    }
+
+    var authProvider = Provider.of<AuthProvider>(context, listen: false);
+    showLoadingDialog("Loading...");
+    print(authProvider.appUser?.id);
+    var response = await EventsDao.updateEvent(
+      event: EventModel(
+        date: Timestamp.fromDate(selectedDate!),
+        description: descriptionController.text,
+        title: titleController.text,
+        time: selectedTime?.millisecondsSinceEpoch,
+        eventTypeId: eventTypes[selexctedIndex].id,
+        id: eventModel?.id,
+      ),
+      userId: authProvider.appUser?.id ?? "",
+    );
+    print('updating in add event');
+
+    hideDialog();
+    print('$response');
+
+    if (response.isSuccess) {
+      showMessageDialog(
+        "Event Successfully Updated",
+        posActionTitle: "ok",
+        posAction: () => {Navigator.pop(context)},
+      );
+    } else {
+      showMessageDialog(response.getErrorMessage(), posActionTitle: "ok");
+    }
+  }
+
   DateTime? selectedDate;
   DateTime? selectedTime;
 
@@ -322,7 +393,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
       context: context,
       initialDate: selectedDate ?? DateTime.now(),
       firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(Duration(days: 365)),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
     );
     setState(() {
       selectedDate = choosenDate;
@@ -350,6 +421,10 @@ class _AddEventScreenState extends State<AddEventScreen> {
       hasValidTime = true;
     });
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }
 
 extension on DateTime {

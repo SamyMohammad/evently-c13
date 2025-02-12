@@ -4,8 +4,7 @@ class EventModel {
   String? id;
   String? title;
   String? description;
-  String? lat;
-  String? long;
+  GeoPoint? geoPoint;
   Timestamp? date;
   int? time;
   int? eventTypeId;
@@ -14,8 +13,7 @@ class EventModel {
     this.id,
     this.title,
     this.description,
-    this.lat,
-    this.long,
+    this.geoPoint,
     this.date,
     this.time,
     this.eventTypeId,
@@ -28,8 +26,7 @@ class EventModel {
             title: data?["title"],
             description: data?["description"],
             eventTypeId: data?["eventTypeId"],
-            lat: data?["lat"],
-            long: data?["long"],
+            geoPoint: data?["geoPoint"],
             date: data?["date"],
             time: data?["time"],
             isFavorite: data?["isFavorite"] ?? false);
@@ -39,8 +36,7 @@ class EventModel {
       "id": id,
       "title": title,
       "description": description,
-      "lat": lat,
-      "long": long,
+      "geoPoint": geoPoint,
       "date": date,
       "time": time,
       "eventTypeId": eventTypeId,
