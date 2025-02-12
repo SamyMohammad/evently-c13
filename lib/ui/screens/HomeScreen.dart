@@ -3,12 +3,12 @@ import 'package:evently_c13/core/dialog_utils.dart';
 import 'package:evently_c13/db/model/AppUser.dart';
 import 'package:evently_c13/db/model/event_type_model.dart';
 import 'package:evently_c13/providers/AuthProvider.dart';
-import 'package:evently_c13/ui/screens/add_event_screen.dart';
 import 'package:evently_c13/ui/screens/login_screen.dart';
 import 'package:evently_c13/ui/screens/tabs/favorite/favorite_tab.dart';
 import 'package:evently_c13/ui/screens/tabs/home/home_tab.dart';
 import 'package:evently_c13/ui/screens/tabs/map/map_tab.dart';
 import 'package:evently_c13/ui/screens/tabs/profile/profile_tab.dart';
+import 'package:evently_c13/ui/screens/upsert_event_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -66,7 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 side: BorderSide(color: AppColors.white, width: 5),
               ),
               onPressed: () {
-                Navigator.pushNamed(context, AddEventScreen.routeName);
+                Navigator.pushNamed(context, UpsertEventScreen.routeName);
               },
               backgroundColor: AppColors.purple,
               child: const Icon(

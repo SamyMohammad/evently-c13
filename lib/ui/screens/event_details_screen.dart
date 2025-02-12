@@ -1,4 +1,5 @@
 import 'package:evently_c13/db/model/event_model.dart';
+import 'package:evently_c13/ui/screens/upsert_event_screen.dart';
 import 'package:evently_c13/ui/widgets/selection_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -15,7 +16,9 @@ class EventDetailsScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Event Details"),
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.edit)),
+          IconButton(onPressed: () {
+            Navigator.pushNamed(context, UpsertEventScreen.routeName,arguments: event);
+          }, icon: const Icon(Icons.edit)),
           IconButton(
               onPressed: () {},
               icon: const Icon(

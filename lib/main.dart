@@ -4,12 +4,12 @@ import 'package:evently_c13/providers/AuthProvider.dart';
 import 'package:evently_c13/providers/language_provider.dart';
 import 'package:evently_c13/providers/theme_provider.dart';
 import 'package:evently_c13/ui/screens/HomeScreen.dart';
-import 'package:evently_c13/ui/screens/add_event_screen.dart';
 import 'package:evently_c13/ui/screens/event_details_screen.dart';
 import 'package:evently_c13/ui/screens/forget_password.dart';
 import 'package:evently_c13/ui/screens/login_screen.dart';
 import 'package:evently_c13/ui/screens/register_screen.dart';
 import 'package:evently_c13/ui/screens/setup_screen.dart';
+import 'package:evently_c13/ui/screens/upsert_event_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -63,7 +63,7 @@ class MyApp extends StatelessWidget {
       supportedLocales: AppLocalizations.supportedLocales,
       locale: Locale(languageProvider.currentLocale),
       routes: {
-        AddEventScreen.routeName: (_) => const AddEventScreen(),
+        UpsertEventScreen.routeName: (_) => const UpsertEventScreen(),
         HomeScreen.routeName: (_) => const HomeScreen(),
         SetupScreen.routeName: (_) => const SetupScreen(),
         LoginScreen.routeName: (_) => const LoginScreen(),
