@@ -10,6 +10,8 @@ import 'package:evently_c13/ui/widgets/custom_text_form_field.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:evently_c13/ui/screens/select_location_screen.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class UpsertEventScreen extends StatefulWidget {
   static const String routeName = "add_event";
@@ -19,14 +21,13 @@ class UpsertEventScreen extends StatefulWidget {
   State<UpsertEventScreen> createState() => _UpsertEventScreenState();
 }
 
-class _UpsertEventScreenState extends State<UpsertEventScreen>
-    with AutomaticKeepAliveClientMixin {
+class _UpsertEventScreenState extends State<UpsertEventScreen> with AutomaticKeepAliveClientMixin {
   var selexctedIndex = 0;
   List<EventType> eventTypes = [];
   late TextEditingController titleController;
   late TextEditingController descriptionController;
   EventModel? eventModel;
-
+  LatLng? selectedLocation;
   @override
   void initState() {
     super.initState();
@@ -57,7 +58,6 @@ class _UpsertEventScreenState extends State<UpsertEventScreen>
       setState(() {});
     });
   }
-
   var formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
@@ -133,35 +133,138 @@ class _UpsertEventScreenState extends State<UpsertEventScreen>
       ),
     );
   }
-
-  Container buildChooseLocation() {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: AppColors.purple),
-      ),
-      child: Row(spacing: 8, children: [
-        Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: AppColors.purple,
-              borderRadius: BorderRadius.circular(10),
+  InkWell buildChooseLocation() {
+    return InkWell(
+      onTap: () async {
+        final LatLng? result = await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SelectLocationScreen(
+              initialLocation: selectedLocation,
             ),
-            child: const Icon(
-              Icons.location_on,
-              color: AppColors.white,
-            )),
-        const Text("Choose Event Location"),
-        const Spacer(),
-        const Icon(
-          Icons.arrow_forward_ios,
-          color: AppColors.purple,
-        )
-      ]),
+          ),
+        );
+        if (result != null) {
+          setState(() {
+            selectedLocation = result;
+          });
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(color: AppColors.purple),
+        ),
+        child: Row(spacing: 8, children: [
+          Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: AppColors.purple,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(
+                Icons.location_on,
+                color: AppColors.white,
+              )),
+          Expanded(
+            child: Text(
+              selectedLocation != null 
+                ? "Location: ${selectedLocation!.latitude.toStringAsFixed(4)}, ${selectedLocation!.longitude.toStringAsFixed(4)}"
+                : "Choose Event Location",
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          const Icon(
+            Icons.arrow_forward_ios,
+            color: AppColors.purple,
+          )
+        ]),
+      ),
     );
   }
+  void addEvent() async {
+    setState(() {
+      hasValidTime = selectedTime != null;
+      hasValidDate = selectedDate != null;
+    });
+    if (formKey.currentState?.validate() == false ||
+        !hasValidTime && !hasValidDate) {
+      return;
+    }
 
+    var authProvider = Provider.of<AuthProvider>(context, listen: false);
+    showLoadingDialog("Loading...");
+    print(authProvider.appUser?.id);
+
+    var response = await EventsDao.addEvent(
+        authProvider.appUser?.id ?? "",
+        titleController.text,
+        descriptionController.text,
+        selectedDate!,
+        selectedTime!.millisecondsSinceEpoch,
+        eventTypes[selexctedIndex].id,
+        selectedLocation != null 
+          ? GeoPoint(selectedLocation!.latitude, selectedLocation!.longitude)
+          : const GeoPoint(31.244288, 29.9859968));
+
+    print('adding in add event');
+
+    hideDialog();
+    print('$response');
+
+    if (response.isSuccess) {
+      showMessageDialog(
+        "Event Successfully Added",
+        posActionTitle: "ok",
+        posAction: () => {Navigator.pop(context)},
+      );
+    } else {
+      showMessageDialog(response.getErrorMessage(), posActionTitle: "ok");
+    }
+  }
+  Future<void> updateEvent() async {
+    setState(() {
+      hasValidTime = selectedTime != null;
+      hasValidDate = selectedDate != null;
+    });
+    if (formKey.currentState?.validate() == false ||
+        !hasValidTime && !hasValidDate) {
+      return;
+    }
+
+    var authProvider = Provider.of<AuthProvider>(context, listen: false);
+    showLoadingDialog("Loading...");
+    print(authProvider.appUser?.id);
+    var response = await EventsDao.updateEvent(
+      event: EventModel(
+        date: Timestamp.fromDate(selectedDate!),
+        description: descriptionController.text,
+        title: titleController.text,
+        time: selectedTime?.millisecondsSinceEpoch,
+        eventTypeId: eventTypes[selexctedIndex].id,
+        id: eventModel?.id,
+        geoPoint: selectedLocation != null 
+          ? GeoPoint(selectedLocation!.latitude, selectedLocation!.longitude)
+          : const GeoPoint(31.244288, 29.9859968),
+      ),
+      userId: authProvider.appUser?.id ?? "",
+    );
+    print('updating in add event');
+
+    hideDialog();
+    print('$response');
+
+    if (response.isSuccess) {
+      showMessageDialog(
+        "Event Successfully Updated",
+        posActionTitle: "ok",
+        posAction: () => {Navigator.pop(context)},
+      );
+    } else {
+      showMessageDialog(response.getErrorMessage(), posActionTitle: "ok");
+    }
+  }
   InkWell buildChooseTime() {
     return InkWell(
       onTap: () {
@@ -206,7 +309,6 @@ class _UpsertEventScreenState extends State<UpsertEventScreen>
       ),
     );
   }
-
   InkWell buildChooseDate() {
     return InkWell(
       onTap: () {
@@ -253,7 +355,6 @@ class _UpsertEventScreenState extends State<UpsertEventScreen>
       ),
     );
   }
-
   SizedBox buildEventTypesListView() {
     return SizedBox(
       height: 50,
@@ -302,92 +403,10 @@ class _UpsertEventScreenState extends State<UpsertEventScreen>
           }),
     );
   }
-
   bool hasValidDate = true;
   bool hasValidTime = true;
-
-  void addEvent() async {
-    setState(() {
-      hasValidTime = selectedTime != null;
-      hasValidDate = selectedDate != null;
-    });
-    if (formKey.currentState?.validate() == false ||
-        !hasValidTime && !hasValidDate) {
-      return;
-    }
-
-    var authProvider = Provider.of<AuthProvider>(context, listen: false);
-    showLoadingDialog("Loading...");
-    print(authProvider.appUser?.id);
-
-    var response = await EventsDao.addEvent(
-        authProvider.appUser?.id ?? "",
-        titleController.text,
-        descriptionController.text,
-        selectedDate!,
-        selectedTime!.millisecondsSinceEpoch,
-        eventTypes[selexctedIndex].id,
-        const GeoPoint(31.244288, 29.9859968));
-
-    print('adding in add event');
-
-    hideDialog();
-    print('$response');
-
-    if (response.isSuccess) {
-      showMessageDialog(
-        "Event Successfully Added",
-        posActionTitle: "ok",
-        posAction: () => {Navigator.pop(context)},
-      );
-    } else {
-      showMessageDialog(response.getErrorMessage(), posActionTitle: "ok");
-    }
-  }
-
-  Future<void> updateEvent() async {
-    setState(() {
-      hasValidTime = selectedTime != null;
-      hasValidDate = selectedDate != null;
-    });
-    if (formKey.currentState?.validate() == false ||
-        !hasValidTime && !hasValidDate) {
-      return;
-    }
-
-    var authProvider = Provider.of<AuthProvider>(context, listen: false);
-    showLoadingDialog("Loading...");
-    print(authProvider.appUser?.id);
-    var response = await EventsDao.updateEvent(
-      event: EventModel(
-        date: Timestamp.fromDate(selectedDate!),
-        description: descriptionController.text,
-        title: titleController.text,
-        time: selectedTime?.millisecondsSinceEpoch,
-        eventTypeId: eventTypes[selexctedIndex].id,
-        id: eventModel?.id,
-      ),
-      userId: authProvider.appUser?.id ?? "",
-    );
-    print('updating in add event');
-
-    hideDialog();
-    print('$response');
-
-    if (response.isSuccess) {
-      showMessageDialog(
-        "Event Successfully Updated",
-        posActionTitle: "ok",
-        posAction: () => {Navigator.pop(context)},
-      );
-    } else {
-      showMessageDialog(response.getErrorMessage(), posActionTitle: "ok");
-    }
-  }
-
   DateTime? selectedDate;
   DateTime? selectedTime;
-
   void showDatPickerDialog() async {
     var choosenDate = await showDatePicker(
       context: context,
@@ -400,7 +419,6 @@ class _UpsertEventScreenState extends State<UpsertEventScreen>
       hasValidDate = choosenDate != null;
     });
   }
-
   void showTimePickerDialog() async {
     var now =
         TimeOfDay(hour: DateTime.now().hour, minute: DateTime.now().minute);
@@ -421,7 +439,6 @@ class _UpsertEventScreenState extends State<UpsertEventScreen>
       hasValidTime = true;
     });
   }
-
   @override
   // TODO: implement wantKeepAlive
   bool get wantKeepAlive => true;
